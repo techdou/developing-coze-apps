@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the structure and internal consistency of this Anthropic-style skill."""
+"""Validate structure and internal consistency of the developing-coze-apps skill."""
 
 from __future__ import annotations
 
@@ -13,17 +13,30 @@ REQUIRED_FILES = [
     "SKILL.md",
     "README.md",
     "CHANGELOG.md",
+    "VERSION",
     "docs/official-evidence-map.md",
+    "docs/environment-separation.md",
+    "docs/environment-variables.md",
+    "docs/database-storage-lifecycle.md",
+    "docs/production-deployment.md",
+    "docs/auth-bootstrap-patterns.md",
     "docs/single-html-mode-selection.md",
     "docs/single-html-security.md",
     "docs/static-bundling-compatibility.md",
     "docs/image-generation-for-single-html.md",
+    "templates/environment-matrix.md",
+    "templates/production-handoff.md",
+    "templates/production-readiness-checklist.md",
     "templates/single-html/catalog.md",
     "templates/single-html/catalog.json",
+    "scripts/coze_env_audit.py",
+    "scripts/coze_project_audit.py",
+    "scripts/check_supabase_consistency.py",
     "scripts/single_html_tool.py",
     "scripts/test_single_html_tool.py",
+    "reference/Coze开发与生产环境技术参考-v2.0.md",
 ]
-RECOMMENDED_DIRS = ["docs", "templates", "scripts", "examples", "evals"]
+RECOMMENDED_DIRS = ["docs", "templates", "scripts", "examples", "evals", "reference"]
 EXPECTED_TEMPLATE_IDS = {
     "fullscreen-iframe",
     "app-shell-iframe",
@@ -34,6 +47,7 @@ EXPECTED_TEMPLATE_IDS = {
     "course-article",
     "gallery-showcase",
 }
+MIN_EVAL_CASES = 12
 
 
 def parse_frontmatter(text: str) -> dict[str, str]:
@@ -44,19 +58,29 @@ def parse_frontmatter(text: str) -> dict[str, str]:
         return {}
     block = text[4:end]
     data: dict[str, str] = {}
+    current_key: str | None = None
     for line in block.splitlines():
+        if line.startswith("  ") and current_key:
+            data[current_key] = (data.get(current_key, "") + " " + line.strip()).strip()
+            continue
         if ":" in line:
             k, v = line.split(":", 1)
-            data[k.strip()] = v.strip().strip('"').strip("'")
+            current_key = k.strip()
+            data[current_key] = v.strip().strip('"').strip("'")
     return data
 
 
 def collect_backtick_paths(text: str) -> set[str]:
     paths: set[str] = set()
     for token in re.findall(r"`([^`]+)`", text):
-        if token.startswith(("docs/", "templates/", "scripts/", "examples/", "evals/")):
+        if token.startswith(("docs/", "templates/", "scripts/", "examples/", "evals/", "reference/")):
             paths.add(token.rstrip("/.,;:"))
     return paths
+
+
+def read_version(root: Path) -> str:
+    p = root / "VERSION"
+    return p.read_text(encoding="utf-8").strip() if p.exists() else ""
 
 
 def main() -> int:
@@ -87,11 +111,16 @@ def main() -> int:
         if len(desc) > 1024:
             errors.append("Description exceeds 1024 characters; sharpen trigger scope")
         body = text.split("\n---", 2)[-1]
-        if len(body) > 14000:
+        if len(body) > 18000:
             warnings.append("SKILL.md body is large; move more details into docs/templates")
-        if "Do not use this skill" not in text:
-            warnings.append("Negative trigger conditions are missing")
-        for required_phrase in ["dist/index.single.html", "Single-HTML / iframe workflow", "Read only what the task needs"]:
+        for required_phrase in [
+            "Do not use this skill",
+            "Mandatory environment gate",
+            "Production deployment workflow",
+            "dist/index.single.html",
+            "Single-HTML / iframe workflow",
+            "Read only what the task needs",
+        ]:
             if required_phrase not in text:
                 errors.append(f"SKILL.md missing required workflow phrase: {required_phrase}")
         for rel in sorted(collect_backtick_paths(text)):
@@ -101,6 +130,16 @@ def main() -> int:
     for d in RECOMMENDED_DIRS:
         if not (root / d).exists():
             warnings.append(f"Recommended directory missing: {d}/")
+
+    # VERSION / changelog consistency.
+    version = read_version(root)
+    if version and not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?", version):
+        errors.append(f"VERSION is not semantic-version-like: {version}")
+    changelog = root / "CHANGELOG.md"
+    if version and changelog.exists():
+        text = changelog.read_text(encoding="utf-8", errors="ignore")
+        if not re.search(rf"(?m)^##\s+{re.escape(version)}(?:\s|$)", text):
+            errors.append(f"CHANGELOG.md has no top-level entry for VERSION {version}")
 
     # Validate template catalog and files.
     catalog_path = root / "templates" / "single-html" / "catalog.json"
@@ -124,7 +163,14 @@ def main() -> int:
                 errors.append(f"Config example missing for template ID: {tid}")
 
     # Python syntax checks.
-    for rel in ["scripts/single_html_tool.py", "scripts/test_single_html_tool.py", "scripts/coze_project_audit.py"]:
+    python_scripts = [
+        "scripts/single_html_tool.py",
+        "scripts/test_single_html_tool.py",
+        "scripts/coze_project_audit.py",
+        "scripts/coze_env_audit.py",
+        "scripts/check_supabase_consistency.py",
+    ]
+    for rel in python_scripts:
         path = root / rel
         if path.exists():
             try:
@@ -132,16 +178,21 @@ def main() -> int:
             except py_compile.PyCompileError as exc:
                 errors.append(f"Python compile failed for {rel}: {exc.msg}")
 
-    # Eval coverage.
+    # Eval coverage and pair integrity.
     case_dir = root / "evals" / "cases"
     exp_dir = root / "evals" / "expected"
     cases = sorted(case_dir.glob("*.md")) if case_dir.exists() else []
-    if len(cases) < 8:
-        warnings.append("Fewer than 8 eval cases found")
+    if len(cases) < MIN_EVAL_CASES:
+        errors.append(f"Expected at least {MIN_EVAL_CASES} eval cases, found {len(cases)}")
     for case in cases:
         expected = exp_dir / case.name.replace(".md", ".expected.md")
         if not expected.exists():
             errors.append(f"Missing expected output criteria for eval: {case.name}")
+
+    # v0.4 environment evals must exist explicitly.
+    for prefix in ["09-", "10-", "11-", "12-"]:
+        if not any(p.name.startswith(prefix) for p in cases):
+            errors.append(f"Missing v0.4 environment eval case prefix: {prefix}")
 
     print("# Skill Package Validation\n")
     if errors:

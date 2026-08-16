@@ -1,5 +1,45 @@
 # Changelog
 
+## 0.4.0 - 2026-08-17
+
+### Major: DEV / PROD lifecycle
+
+This release upgrades the skill from project-development guidance to an environment-aware production engineering workflow.
+
+### Added
+
+- Added mandatory DEV/PROD environment gate for projects using database, auth, object storage, secrets, or deployment.
+- Added `docs/environment-separation.md` with explicit resource-boundary and data-promotion rules.
+- Added `docs/environment-variables.md` with four ownership classes: `platform_injected`, `app_private`, `client_public`, and `local_only`.
+- Added `docs/database-storage-lifecycle.md` covering migrations, seeds, auth state, object-key persistence, asset promotion, backup, and rollback.
+- Added `docs/production-deployment.md` covering evidence-first CLI verification, production preflight, resource verification, migrations, deploy, smoke test, bootstrap, and handoff.
+- Added `docs/auth-bootstrap-patterns.md` to clearly separate project-specific first-admin/bootstrap mechanisms from Coze platform guarantees.
+- Added `templates/environment-matrix.md` and `templates/production-handoff.md`.
+- Added `scripts/coze_env_audit.py` with DEV/PROD/environment/bootstrap/storage security heuristics.
+- Added eval cases 09-12 for database isolation, production variable ownership, project-specific bootstrap, and object-storage promotion.
+- Added `examples/relay-studio-dev-prod-hardening.md` based on the Relay Studio production-hardening workflow.
+- Added `reference/Coze开发与生产环境技术参考-v2.0.pdf` and its Markdown source as a production-oriented reference manual.
+
+### Changed
+
+- Reworked `SKILL.md` routing so production/environment tasks load only the relevant DEV/PROD docs/templates.
+- Reworked `templates/architecture-blueprint.md` to require environment matrix, migration/data policy, storage promotion, environment-variable registry, bootstrap posture, and production handoff.
+- Reworked `templates/production-readiness-checklist.md` with P0 environment-isolation blockers and post-deploy smoke tests.
+- Updated `docs/official-evidence-map.md` review date and evidence hierarchy; current official documentation/CLI/runtime evidence now outranks uploaded reports and project wrappers.
+- Added current `@coze/cli` verification guidance (`coze --version`, `coze code ... --help`) instead of treating older command examples as permanent contracts.
+- Updated README around production lifecycle and new audit tooling.
+
+### Production safety defaults
+
+- DEV→PROD ordinary business/test-data sync is OFF unless explicitly reviewed and approved.
+- Schema is promoted through versioned migrations rather than implicit database copying.
+- DEV Auth users/sessions/default admins do not enter PROD by default.
+- DEV object keys are not assumed to exist in PROD; curated assets use explicit promotion manifests.
+- `.env.local` is local/DEV-only and cannot be production source of truth.
+- Reserved/platform-prefixed variables are verified in the current runtime rather than copied from DEV.
+- Missing privileged production configuration must fail fast rather than silently fall back to anonymous/public/DEV credentials.
+- `BOOTSTRAP_*` and `/api/auth/bootstrap` are treated as project-specific unless official evidence explicitly defines them.
+
 ## 0.3.2 - 2026-07-22
 
 ### Fixed
