@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<style>
+:root{--accent:{{ACCENT}};--bg:#090c12;--text:#f5f7fb;--muted:#bac2d0}*{box-sizing:border-box}html{scroll-snap-type:y proximity;background:var(--bg)}body{margin:0;color:var(--text);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.opening{min-height:100vh;display:grid;place-items:end start;padding:clamp(28px,7vw,100px);background:linear-gradient(180deg,transparent 20%,rgba(0,0,0,.84)),url('{{HERO_IMAGE}}') center/cover}.opening h1{font-size:clamp(48px,9vw,120px);line-height:.9;max-width:1000px;margin:0}.opening p{max-width:720px;font-size:20px;line-height:1.7;color:var(--muted)}.story{min-height:100vh;scroll-snap-align:start;display:grid;grid-template-columns:1.2fr .8fr;align-items:center;gap:clamp(24px,6vw,90px);padding:clamp(24px,6vw,90px)}.story img{width:100%;height:min(76vh,760px);object-fit:cover;border-radius:26px}.story h2{font-size:clamp(34px,5vw,72px);margin:0 0 18px}.story p{font-size:18px;line-height:1.9;color:var(--muted);white-space:pre-line}.index{font-size:13px;color:var(--accent);letter-spacing:.14em;font-weight:850}@media(max-width:850px){.story{grid-template-columns:1fr}.story img{height:52vh}}
+</style></head><body>
+<header class="opening"><div><div>{{KICKER}}</div><h1>{{TITLE}}</h1><p>{{SUMMARY}}</p></div></header>{{SECTIONS_HTML}}
+</body></html>

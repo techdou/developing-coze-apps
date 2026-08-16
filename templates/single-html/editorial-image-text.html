@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<style>
+:root{--accent:{{ACCENT}};--ink:#22252b;--muted:#626a78;--paper:#f7f3ea;--card:#fffdf8}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.hero{min-height:68vh;display:grid;grid-template-columns:1.05fr .95fr;align-items:stretch}.hero-copy{padding:clamp(32px,7vw,100px);display:flex;flex-direction:column;justify-content:center}.kicker{color:var(--accent);font-weight:850;letter-spacing:.14em;text-transform:uppercase}.hero h1{font-size:clamp(42px,7vw,96px);line-height:.96;margin:18px 0}.summary{font-size:clamp(17px,1.8vw,23px);line-height:1.75;color:var(--muted)}.hero-media{min-height:420px;background:url('{{HERO_IMAGE}}') center/cover no-repeat}.content{max-width:1180px;margin:auto;padding:72px 24px}.section{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,6vw,88px);align-items:center;padding:56px 0;border-top:1px solid rgba(34,37,43,.14)}.section:nth-child(even) .media{order:2}.media img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover;border-radius:24px}.copy h2{font-size:clamp(28px,4vw,52px);margin:0 0 18px}.copy p{font-size:18px;line-height:1.9;color:var(--muted);white-space:pre-line}.caption{font-size:13px;color:var(--muted);margin-top:8px}@media(max-width:800px){.hero{grid-template-columns:1fr}.hero-media{min-height:48vh}.section{grid-template-columns:1fr}.section:nth-child(even) .media{order:0}}
+</style></head><body>
+<header class="hero"><div class="hero-copy"><div class="kicker">{{KICKER}}</div><h1>{{TITLE}}</h1><div class="summary">{{SUMMARY}}</div></div><div class="hero-media" role="img" aria-label="{{HERO_ALT}}"></div></header>
+<main class="content">{{SECTIONS_HTML}}</main>
+</body></html>

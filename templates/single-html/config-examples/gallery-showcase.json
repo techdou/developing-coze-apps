@@ -1,0 +1,22 @@
+{
+  "title": "建筑多视图参考",
+  "kicker": "3D 建模素材",
+  "summary": "保持主体结构和比例一致。",
+  "accent": "#7c3aed",
+  "items": [
+    {
+      "title": "正视图",
+      "description": "用于主体宽高比例识别。",
+      "image": "",
+      "alt": "建筑正视图",
+      "tag": "Front"
+    },
+    {
+      "title": "后视图",
+      "description": "用于背部结构还原。",
+      "image": "",
+      "alt": "建筑后视图",
+      "tag": "Back"
+    }
+  ]
+}

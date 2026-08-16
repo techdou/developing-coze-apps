@@ -1,0 +1,24 @@
+{
+  "title": "河流与城市",
+  "kicker": "地理专题",
+  "summary": "通过图文理解河流塑造城市空间的过程。",
+  "hero_image": "",
+  "hero_alt": "河流城市景观",
+  "accent": "#b45309",
+  "sections": [
+    {
+      "heading": "上游",
+      "body": "地形控制水流方向与落差。",
+      "image": "",
+      "alt": "上游河谷",
+      "caption": "示意图"
+    },
+    {
+      "heading": "下游",
+      "body": "河流与城市功能空间相互影响。",
+      "image": "",
+      "alt": "下游城市",
+      "caption": "示意图"
+    }
+  ]
+}

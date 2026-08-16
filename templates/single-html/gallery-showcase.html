@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<style>
+:root{--accent:{{ACCENT}};--bg:#f3f5f7;--ink:#18202d;--muted:#647084}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.head{padding:clamp(34px,7vw,88px) 24px;text-align:center}.head h1{font-size:clamp(40px,7vw,88px);line-height:1;margin:10px 0}.head p{max-width:760px;margin:auto;font-size:19px;line-height:1.7;color:var(--muted)}.grid{max-width:1300px;margin:auto;padding:0 24px 80px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}.card{background:#fff;border-radius:22px;overflow:hidden;box-shadow:0 12px 34px rgba(15,23,42,.08);transition:transform .2s}.card:hover{transform:translateY(-4px)}.card img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}.body{padding:18px}.body h2{font-size:20px;margin:0 0 8px}.body p{margin:0;color:var(--muted);line-height:1.65}.tag{display:inline-block;font-size:12px;color:var(--accent);font-weight:800;margin-bottom:8px}
+</style></head><body>
+<header class="head"><div>{{KICKER}}</div><h1>{{TITLE}}</h1><p>{{SUMMARY}}</p></header><main class="grid">{{ITEMS_HTML}}</main>
+</body></html>

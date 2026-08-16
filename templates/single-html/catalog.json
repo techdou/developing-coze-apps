@@ -1,0 +1,97 @@
+{
+  "version": "1.0.0",
+  "default_output": "dist/index.single.html",
+  "templates": [
+    {
+      "id": "fullscreen-iframe",
+      "name_zh": "全屏应用嵌入",
+      "source_kind": "url",
+      "iframe": true,
+      "required": [
+        "title",
+        "url"
+      ],
+      "status": "iframe-wrapper"
+    },
+    {
+      "id": "app-shell-iframe",
+      "name_zh": "应用外壳",
+      "source_kind": "url",
+      "iframe": true,
+      "required": [
+        "title",
+        "url"
+      ],
+      "status": "iframe-wrapper"
+    },
+    {
+      "id": "split-intro-iframe",
+      "name_zh": "图文介绍 + 应用分栏",
+      "source_kind": "url",
+      "iframe": true,
+      "required": [
+        "title",
+        "url",
+        "summary"
+      ],
+      "status": "iframe-wrapper"
+    },
+    {
+      "id": "cover-launch-iframe",
+      "name_zh": "封面启动式应用",
+      "source_kind": "url",
+      "iframe": true,
+      "required": [
+        "title",
+        "url"
+      ],
+      "status": "iframe-wrapper"
+    },
+    {
+      "id": "editorial-image-text",
+      "name_zh": "图文阅读页",
+      "source_kind": "content",
+      "iframe": false,
+      "required": [
+        "title",
+        "summary",
+        "sections"
+      ],
+      "status": "self-contained-when-assets-inlined"
+    },
+    {
+      "id": "visual-story",
+      "name_zh": "沉浸式视觉叙事",
+      "source_kind": "content",
+      "iframe": false,
+      "required": [
+        "title",
+        "sections"
+      ],
+      "status": "self-contained-when-assets-inlined"
+    },
+    {
+      "id": "course-article",
+      "name_zh": "课程文章",
+      "source_kind": "content",
+      "iframe": false,
+      "required": [
+        "title",
+        "objectives",
+        "sections"
+      ],
+      "status": "self-contained-when-assets-inlined"
+    },
+    {
+      "id": "gallery-showcase",
+      "name_zh": "图库展示",
+      "source_kind": "content",
+      "iframe": false,
+      "required": [
+        "title",
+        "items"
+      ],
+      "status": "self-contained-when-assets-inlined"
+    }
+  ]
+}

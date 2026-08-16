@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<style>
+:root{--accent:{{ACCENT}};--ink:#152033;--muted:#5b677a;--bg:#eef3f7;--paper:#fff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif}.cover{padding:clamp(42px,8vw,110px) 24px;background:linear-gradient(135deg,#0f172a,#1e3a5f);color:#fff}.cover-inner{max-width:1050px;margin:auto}.cover h1{font-size:clamp(40px,7vw,86px);line-height:1;margin:12px 0}.cover p{max-width:760px;font-size:20px;line-height:1.7;color:#dbeafe}.layout{max-width:1180px;margin:-38px auto 0;padding:0 24px 80px;display:grid;grid-template-columns:260px 1fr;gap:24px}.side,.article{background:var(--paper);border-radius:20px;box-shadow:0 14px 50px rgba(15,23,42,.08)}.side{align-self:start;position:sticky;top:16px;padding:22px}.side h2{font-size:16px}.side ul{padding-left:20px;line-height:1.8}.article{padding:clamp(26px,5vw,64px)}.objectives{padding:18px 20px;border-left:5px solid var(--accent);background:#f8fafc;border-radius:10px}.article section{padding:34px 0;border-bottom:1px solid #e5e7eb}.article h2{font-size:clamp(28px,4vw,46px)}.article p{font-size:18px;line-height:1.9;color:var(--muted);white-space:pre-line}.article img{max-width:100%;border-radius:18px;display:block;margin:22px auto}.activity{background:#fff7ed;border:1px solid #fed7aa;padding:22px;border-radius:16px}@media(max-width:850px){.layout{grid-template-columns:1fr}.side{position:static}}
+</style></head><body>
+<header class="cover"><div class="cover-inner"><div>{{KICKER}}</div><h1>{{TITLE}}</h1><p>{{SUMMARY}}</p></div></header>
+<div class="layout"><aside class="side"><h2>学习目标</h2><ul>{{OBJECTIVES_HTML}}</ul></aside><main class="article"><div class="objectives"><strong>本课导读</strong><div>{{LEAD}}</div></div>{{SECTIONS_HTML}}<div class="activity"><strong>学习活动</strong><div>{{ACTIVITY}}</div></div></main></div>
+</body></html>

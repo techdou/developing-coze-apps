@@ -1,0 +1,11 @@
+{
+  "title": "AI 教学应用",
+  "subtitle": "课程交互与练习",
+  "url": "https://example.coze.site",
+  "accent": "#2563eb",
+  "security_profile": "trusted",
+  "allow": [
+    "fullscreen",
+    "microphone"
+  ]
+}

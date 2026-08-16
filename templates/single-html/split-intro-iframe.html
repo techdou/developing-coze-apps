@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>{{TITLE}}</title>
+<style>
+:root{--accent:{{ACCENT}};--ink:#172033;--paper:#f6f3ec;--card:#fff}*{box-sizing:border-box}html,body{min-height:100%;margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink);background:var(--paper)}.layout{min-height:100vh;display:grid;grid-template-columns:minmax(280px,38%) 1fr}.intro{padding:clamp(28px,5vw,72px);display:flex;flex-direction:column;justify-content:center;gap:18px}.kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-weight:800}.intro h1{font-size:clamp(32px,5vw,64px);line-height:1.02;margin:0}.intro p{font-size:clamp(16px,1.5vw,20px);line-height:1.75;margin:0;color:#45516a}.points{display:grid;gap:10px;padding:0;margin:4px 0;list-style:none}.points li{padding:12px 14px;background:rgba(255,255,255,.7);border-left:4px solid var(--accent);border-radius:8px}.open{align-self:flex-start;background:var(--accent);color:white;text-decoration:none;padding:12px 16px;border-radius:12px;font-weight:750}.app{min-height:100vh;padding:12px}.frame-wrap{height:calc(100vh - 24px);background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 20px 70px rgba(30,41,59,.18)}iframe{width:100%;height:100%;border:0;background:white}@media(max-width:900px){.layout{grid-template-columns:1fr}.intro{min-height:auto}.app{min-height:72vh}.frame-wrap{height:72vh}}
+</style></head><body><div class="layout">
+<section class="intro"><div class="kicker">{{KICKER}}</div><h1>{{TITLE}}</h1><p>{{SUMMARY}}</p><ul class="points">{{POINTS_HTML}}</ul><a class="open" href="{{URL}}" target="_blank" rel="noopener noreferrer">在新窗口打开应用</a></section>
+<section class="app"><div class="frame-wrap"><iframe src="{{URL}}" title="{{TITLE}}" referrerpolicy="strict-origin-when-cross-origin" {{SANDBOX_ATTR}} allow="{{ALLOW}}" allowfullscreen></iframe></div></section>
+</div></body></html>

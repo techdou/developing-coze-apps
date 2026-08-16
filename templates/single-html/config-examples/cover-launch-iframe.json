@@ -1,0 +1,12 @@
+{
+  "title": "虚拟仿真实验",
+  "kicker": "课程实验",
+  "summary": "点击进入沉浸式应用。",
+  "hero_image": "",
+  "url": "https://example.coze.site",
+  "accent": "#0ea5e9",
+  "security_profile": "trusted",
+  "allow": [
+    "fullscreen"
+  ]
+}

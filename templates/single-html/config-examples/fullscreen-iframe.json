@@ -1,0 +1,8 @@
+{
+  "title": "课程交互应用",
+  "url": "https://example.coze.site",
+  "security_profile": "trusted",
+  "allow": [
+    "fullscreen"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "title": "进入交互实验",
+  "kicker": "互动教学",
+  "summary": "阅读任务说明后，在右侧完成交互练习。",
+  "points": [
+    "理解核心概念",
+    "完成参数操作",
+    "提交学习反思"
+  ],
+  "url": "https://example.coze.site",
+  "accent": "#b45309",
+  "security_profile": "trusted",
+  "allow": [
+    "fullscreen"
+  ]
+}
