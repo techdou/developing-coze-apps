@@ -2,8 +2,6 @@
 
 一个 Agent Skill，用于规划、开发、审查和打包 Coze Coding（扣子编程）应用——覆盖全栈 Web 应用、Agent、工作流、RAG、媒体生成，以及单 HTML / iframe 打包交付（`dist/index.single.html`）。
 
-当前版本：**v0.3.2**（见 [CHANGELOG.md](CHANGELOG.md)）
-
 ## 这个 skill 做什么
 
 - **平台分层判断**：区分 Coze Coding / 普通 Coze（Agent、Workflow、Plugin、知识库）各自的适用边界，避免把业务系统塞进单个 Bot。
