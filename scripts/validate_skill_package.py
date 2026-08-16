@@ -30,11 +30,13 @@ REQUIRED_FILES = [
     "templates/single-html/catalog.md",
     "templates/single-html/catalog.json",
     "scripts/coze_env_audit.py",
+    "scripts/test_coze_env_audit.py",
     "scripts/coze_project_audit.py",
     "scripts/check_supabase_consistency.py",
     "scripts/single_html_tool.py",
     "scripts/test_single_html_tool.py",
     "reference/Coze开发与生产环境技术参考-v2.0.md",
+    "reference/Coze开发与生产环境技术参考-v2.0.pdf",
 ]
 RECOMMENDED_DIRS = ["docs", "templates", "scripts", "examples", "evals", "reference"]
 EXPECTED_TEMPLATE_IDS = {
@@ -131,7 +133,6 @@ def main() -> int:
         if not (root / d).exists():
             warnings.append(f"Recommended directory missing: {d}/")
 
-    # VERSION / changelog consistency.
     version = read_version(root)
     if version and not re.fullmatch(r"\d+\.\d+\.\d+(?:[-+][A-Za-z0-9.-]+)?", version):
         errors.append(f"VERSION is not semantic-version-like: {version}")
@@ -141,7 +142,6 @@ def main() -> int:
         if not re.search(rf"(?m)^##\s+{re.escape(version)}(?:\s|$)", text):
             errors.append(f"CHANGELOG.md has no top-level entry for VERSION {version}")
 
-    # Validate template catalog and files.
     catalog_path = root / "templates" / "single-html" / "catalog.json"
     if catalog_path.exists():
         try:
@@ -162,12 +162,12 @@ def main() -> int:
             if not (root / "templates" / "single-html" / "config-examples" / f"{tid}.json").exists():
                 errors.append(f"Config example missing for template ID: {tid}")
 
-    # Python syntax checks.
     python_scripts = [
         "scripts/single_html_tool.py",
         "scripts/test_single_html_tool.py",
         "scripts/coze_project_audit.py",
         "scripts/coze_env_audit.py",
+        "scripts/test_coze_env_audit.py",
         "scripts/check_supabase_consistency.py",
     ]
     for rel in python_scripts:
@@ -178,7 +178,6 @@ def main() -> int:
             except py_compile.PyCompileError as exc:
                 errors.append(f"Python compile failed for {rel}: {exc.msg}")
 
-    # Eval coverage and pair integrity.
     case_dir = root / "evals" / "cases"
     exp_dir = root / "evals" / "expected"
     cases = sorted(case_dir.glob("*.md")) if case_dir.exists() else []
@@ -188,8 +187,6 @@ def main() -> int:
         expected = exp_dir / case.name.replace(".md", ".expected.md")
         if not expected.exists():
             errors.append(f"Missing expected output criteria for eval: {case.name}")
-
-    # v0.4 environment evals must exist explicitly.
     for prefix in ["09-", "10-", "11-", "12-"]:
         if not any(p.name.startswith(prefix) for p in cases):
             errors.append(f"Missing v0.4 environment eval case prefix: {prefix}")

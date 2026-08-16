@@ -1,0 +1,38 @@
+name: Validate Skill
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Validate package structure
+        run: python scripts/validate_skill_package.py .
+
+      - name: Test DEV/PROD environment audit
+        run: python scripts/test_coze_env_audit.py
+
+      - name: Test single-HTML tooling
+        run: python scripts/test_single_html_tool.py
+
+      - name: Compile audit scripts
+        run: |
+          python -m py_compile scripts/coze_project_audit.py
+          python -m py_compile scripts/coze_env_audit.py
+          python -m py_compile scripts/check_supabase_consistency.py
