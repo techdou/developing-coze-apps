@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.4.1 - 2026-09-04
+
+### Fixed
+
+- **`scripts/coze_project_audit.py` false positives**:
+  - Hard-coded secret detection now skips values that are configuration key names (plain snake_case identifiers such as `sessionSecret: 'session_secret'`), which are references, not credentials.
+  - Frontend server-only SDK violations now require an actual `import`/`export from`/`require()` of `coze-coding-dev-sdk` or a client-identifier hit (`LLMClient`, `S3Storage`, `SERVICE_ROLE`, etc.); a mention inside UI copy no longer counts.
+  - `.update(`/`.delete(` chains are only treated as database calls when the same statement includes `.from(` (PostgREST-style); in-memory collection calls like `store.delete(key)` on a `Map` are skipped.
+
 ## 0.4.0 - 2026-08-17
 
 ### Major: DEV / PROD lifecycle

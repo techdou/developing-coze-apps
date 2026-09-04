@@ -130,17 +130,43 @@ def audit_file(path: Path, root: Path, findings: list[Finding], strict: bool) ->
         return
 
     # Hard-coded secret-like values.
+    secret_hit = False
     for pat in SECRET_VALUE_PATTERNS:
-        if pat.search(text):
-            level: Level = "P0" if suffix != ".md" else "P1"
-            findings.append(Finding(level, r, "Possible hard-coded secret/token/API key.", "Move secrets to environment variables; rotate exposed values."))
+        for match in pat.finditer(text):
+            # For `key: 'value'`-style matches, skip values that look like
+            # configuration key names (plain snake_case identifiers, e.g.
+            # `sessionSecret: 'session_secret'`), which are not credentials.
+            if ":" in match.group(0) or "=" in match.group(0):
+                inner = re.search(r"['\"]([^'\"]*)['\"]", match.group(0))
+                if inner and re.fullmatch(r"[a-z0-9_-]{3,48}", inner.group(1)):
+                    continue
+            secret_hit = True
             break
+        if secret_hit:
+            break
+    if secret_hit:
+        level: Level = "P0" if suffix != ".md" else "P1"
+        findings.append(Finding(level, r, "Possible hard-coded secret/token/API key.", "Move secrets to environment variables; rotate exposed values."))
 
     is_code = suffix in CODE_EXTS
 
     # SDK/model clients should be server-only.
-    server_only_terms = ["coze-coding-dev-sdk", "LLMClient", "ImageGenerationClient", "VideoGenerationClient", "TTSClient", "ASRClient", "S3Storage", "SERVICE_ROLE"]
-    if is_code and any(term in text for term in server_only_terms) and is_frontend_path(r):
+    # Package names must appear in an actual import/require to count; a mention
+    # inside UI copy (e.g. a models page describing the stack) is not a violation.
+    # Four real module-loading forms: import-from, bare import, export-from, require().
+    server_only_import = re.search(
+        r"^[ \t]*import\s[^;]*?from\s*['\"][^'\"]*coze-coding-dev-sdk[^'\"]*['\"]"
+        r"|^[ \t]*import\s*['\"][^'\"]*coze-coding-dev-sdk[^'\"]*['\"]"
+        r"|^[ \t]*export\s+(?:\*|\{)[^;]*?from\s*['\"][^'\"]*coze-coding-dev-sdk[^'\"]*['\"]"
+        r"|require\(\s*['\"][^'\"]*coze-coding-dev-sdk",
+        text,
+        re.M,
+    )
+    client_identifier_hits = any(
+        re.search(rf"\b{re.escape(term)}\b", text)
+        for term in ("LLMClient", "ImageGenerationClient", "VideoGenerationClient", "TTSClient", "ASRClient", "S3Storage", "SERVICE_ROLE")
+    )
+    if is_code and (server_only_import or client_identifier_hits) and is_frontend_path(r):
         findings.append(Finding("P0", r, "Server-only SDK/client appears in frontend path.", "Move model/storage/database privileged calls to API routes or server actions."))
 
     # Browser-exposed env vars.
@@ -155,6 +181,15 @@ def audit_file(path: Path, root: Path, findings: list[Finding], strict: bool) ->
     else:
         update_delete_iter = []
     for match in update_delete_iter:
+        # Only treat `.update(`/`.delete(` as a DB call when the same statement
+        # chain includes `.from(` (PostgREST-style). In-memory collection calls
+        # such as `store.delete(key)` on a `Map` have no `.from(` and are skipped.
+        snippet_start = text[max(0, match.start() - 200):match.start() + 500]
+        stmt_end = snippet_start.find(";")
+        if stmt_end != -1:
+            snippet_start = snippet_start[:stmt_end]
+        if ".from(" not in snippet_start:
+            continue
         if not chain_has_filter(text, match.start()):
             findings.append(Finding("P1", r, "Database update/delete may lack explicit filter in method chain.", "Add `.eq()`, `.match()`, or another filter before executing the query."))
             break
