@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.4.2 - 2026-10-28
+
+### Changed
+
+- `docs/official-evidence-map.md` 复核日期更新至 2026-10-28，对照 @coze/cli 0.3.11 逐条重验：`coze code env` / `coze code db` 命令组、deploy/preview/deploy fix、repo integration API 面全部仍准确（env 与 db 命令实机 `--help` 验证；repo push/pull 经 CLI 打包源码复核仍为 placeholder，官方 reference 声明与实现不一致，evidence-first 原则继续适用）。
+- `scripts/validate_skill_package.py` 结构校验通过（无错误）；无文档内容改动——本版本为纯复核记录。
+
 ## 0.4.1 - 2026-09-04
 
 ### Fixed

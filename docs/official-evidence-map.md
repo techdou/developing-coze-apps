@@ -2,7 +2,7 @@
 
 Keep official claims, current CLI behavior, uploaded test reports, and project-specific wrappers separate. Re-check current workspace availability before production commitments.
 
-_Last reviewed: 2026-08-17._
+_Last reviewed: 2026-10-28 (against @coze/cli 0.3.11: env/db command groups, deploy/preview/fix, repo integration APIs re-verified)._
 
 ## Evidence priority
 
