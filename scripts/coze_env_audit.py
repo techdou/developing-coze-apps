@@ -15,6 +15,7 @@ import argparse
 import json
 import os
 import re
+import subprocess
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Iterable, Literal
@@ -36,6 +37,7 @@ CLIENT_HINTS = (
 SERVER_EXCLUSIONS = ("/api/", "app/api/", "server/", "src/server/", "route.ts", "route.js")
 
 PLATFORM_PREFIXES = ("COZE_",)
+ENV_EXAMPLES = {".env.example", ".env.sample", ".env.template"}
 PRIVILEGED_NAMES = (
     "SERVICE_ROLE", "SERVICE_ROLE_KEY", "BOOTSTRAP_TOKEN", "PRIVATE_KEY",
     "SECRET_KEY", "API_SECRET", "DATABASE_PASSWORD", "DB_PASSWORD",
@@ -100,19 +102,48 @@ def add(findings: list[Finding], level: Level, rule: str, file: str, issue: str,
     findings.append(Finding(level, rule, file, issue, suggestion))
 
 
+def git_paths(root: Path, *args: str, paths: set[str] | None = None) -> set[str]:
+    stdin = None if paths is None else b"".join(os.fsencode(name) + b"\0" for name in sorted(paths))
+    check_ignore = args[0] == "check-ignore"
+    # Personal ignore rules must not mask missing project protection.
+    config = ("-c", "core.excludesFile=") if check_ignore else ()
+    cp = subprocess.run(["git", "-C", str(root), *config, *args], input=stdin, capture_output=True, timeout=10)
+    # check-ignore exits 1 when no candidate is ignored; index errors are not clean results.
+    if cp.returncode != 0 and not (check_ignore and cp.returncode == 1):
+        raise subprocess.CalledProcessError(cp.returncode, cp.args)
+    return {os.fsdecode(name) for name in cp.stdout.split(b"\0") if name}
+
+
 def audit_gitignore(root: Path, findings: list[Finding]) -> None:
-    gi = root / ".gitignore"
-    if not gi.exists():
-        add(findings, "P1", "ENV001", ".gitignore", ".gitignore is missing.",
-            "Ignore `.env`, `.env.*`, and especially `.env.local`; allowlist only safe examples.")
+    candidates = {".env", ".env.local", *ENV_EXAMPLES}
+    candidates.update(p.name for p in root.glob(".env.*") if p.is_file() or p.is_symlink())
+    try:
+        tracked = git_paths(root, "ls-files", "--cached", "-z", "--", ".env", ":(glob).env.*")
+    except (OSError, subprocess.SubprocessError):
+        add(findings, "P1", "ENV001", ".gitignore", "Cannot verify env ignores or tracked files with Git.",
+            "Run the audit in a Git worktree with Git installed; verify `.env` and `.env.local` are both ignored and untracked.")
         return
-    text = read_text(gi)
-    if not re.search(r"(?m)^\.env(?:\.\*|\*)?\s*$", text) and ".env*" not in text:
-        add(findings, "P1", "ENV001", ".gitignore", "Environment files are not broadly ignored.",
-            "Add `.env` and `.env.*`/`.env*`, then explicitly allow safe `.env.example` if needed.")
-    if ".env.local" not in text and ".env*" not in text and ".env.*" not in text:
-        add(findings, "P1", "ENV002", ".gitignore", "`.env.local` is not clearly ignored.",
-            "Treat `.env.local` as local/DEV-only and exclude it from version control/deployment source.")
+
+    candidates.update(tracked)
+    for name in sorted(tracked - ENV_EXAMPLES):
+        add(findings, "P0", "ENV008", name, f"`{name}` is tracked by Git despite being a private env file.",
+            "Remove it from the index, ignore it, and rotate any credentials exposed in Git history.")
+
+    try:
+        ignored = git_paths(root, "check-ignore", "--no-index", "-z", "--stdin", paths=candidates)
+    except (OSError, subprocess.SubprocessError):
+        add(findings, "P1", "ENV001", ".gitignore", "Git could not determine the ignore status of environment files.",
+            "Fix the Git worktree or ignore configuration and run the audit again.")
+        return
+
+    for name in sorted(candidates - ENV_EXAMPLES - ignored - tracked):
+        rule = "ENV002" if name == ".env.local" else "ENV001"
+        add(findings, "P1", rule, name, f"`{name}` is not ignored by Git.",
+            "Add `.env` and `.env.*` to `.gitignore`, then allowlist only safe examples as needed.")
+    for name in sorted((ignored & ENV_EXAMPLES) - tracked):
+        if name == ".env.example" or (root / name).is_file():
+            add(findings, "INFO", "ENV007", name, f"`{name}` is ignored by Git.",
+                "If this is a shareable template with placeholders only, allowlist it after the broader ignore rules.")
 
 
 def audit_env_files(root: Path, findings: list[Finding], strict: bool) -> None:
@@ -121,7 +152,7 @@ def audit_env_files(root: Path, findings: list[Finding], strict: bool) -> None:
             continue
         r = rel(p, root)
         text = read_text(p)
-        is_example = p.name in {".env.example", ".env.sample", ".env.template"}
+        is_example = p.name in ENV_EXAMPLES
         if p.name == ".env.local":
             add(findings, "P1", "ENV003", r, "`.env.local` exists in project root.",
                 "Keep it DEV-only, ensure git ignores it, and verify production build/start scripts cannot load/copy it.")

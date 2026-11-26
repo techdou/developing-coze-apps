@@ -95,7 +95,7 @@ python scripts/validate_skill_package.py .
 
 `coze_env_audit.py` 重点检测：
 
-- `.env.local` / env 文件生产污染；
+- `.env.local` / env 文件生产污染，以及 Git 已跟踪或未被项目忽略规则排除的私有 env 文件；
 - `COZE_*` 等平台变量被错误固化为 DEV 值；
 - `NEXT_PUBLIC_*` 暴露 service-role/secret/token；
 - startup 自动调用 privileged bootstrap；
